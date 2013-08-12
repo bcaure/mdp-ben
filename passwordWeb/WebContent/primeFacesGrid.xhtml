@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<title>Passwd</title>
+</h:head>
+<h:body>
+<span id="headline">Login/Passwd</span>
+<h:form id="createform">  
+<p:spacer height="30" width="100%">
+</p:spacer>
+    
+    <p:dialog widgetVar="dlg" resizable="false" width="550" closable="true" draggable="true">  
+  
+        <p:panelGrid columns="2" style="margin-bottom:10px;border-width: 0px" >  
+            <h:outputLabel styleClass="ui-dialog-content" value="URL:" />  
+            <p:inputText id="newUrl" value="#{mdpManagedBean.compte.site.url}" style="width:300px" />  
+            <h:outputLabel styleClass="ui-dialog-content" value="Login:" />  
+            <p:inputText id="newLogin" value="#{mdpManagedBean.compte.login}" style="width:300px" />  
+            <h:outputLabel styleClass="ui-dialog-content" value="Password:" />  
+            <p:inputText id="newPassword" value="#{mdpManagedBean.compte.mdp}" style="width:300px" />  
+            <h:outputLabel styleClass="ui-dialog-content" value="Site:" />  
+            <p:inputText id="newLibelle" value="#{mdpManagedBean.compte.site.libelle}" style="width:300px" />  
+            <p:commandButton icon="ui-icon-check" style="width:20px; height:20px" actionListener="#{mdpManagedBean.createListener()}" update="@all"/>
+        </p:panelGrid>  
+
+              
+    </p:dialog> 
+</h:form>>
+<h:form id="primefacesform">
+	<p:growl id="facesmessages_display"/>
+	<p:dataTable id="primeFacesGrid" var="compte" value="#{mdpManagedBean.user.comptes}" 
+	scrollable="true" 
+    scrollHeight="800"
+    editable="true" 
+    emptyMessage="Aucun compte n'a été trouvé"
+	selection="#{mdpManagedBean.selectedComptes}"
+    rowKey="#{compte.id}"
+    style="width:1140px">
+	
+        <p:ajax event="rowEdit" update="@this" listener="#{mdpManagedBean.modifyListener}" />
+        <p:ajax event="rowEditCancel" update="@this" />  
+		<p:column selectionMode="multiple" style="width:50px;margin-left:auto;margin-right:auto" />
+		<p:column styleClass="header" sortBy="#{compte.site.url}" 
+			filterBy="#{compte.site.url}" filterMatchMode="contains" filterStyleClass="filter-input"
+			style="width:300px">
+			<f:facet name="header">
+				<h:outputText value="URL" />
+			</f:facet>
+			<p:cellEditor>
+				<f:facet name="output">
+                    <h:outputLink value="#{compte.site.url}" target="_newtab">#{compte.site.url}</h:outputLink>
+				</f:facet>
+				<f:facet name="input">
+					<h:inputText value="#{compte.site.url}" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column styleClass="header" sortBy="#{compte.login}" filterBy="#{compte.login}" filterStyleClass="filter-input"
+			style="width:200px">
+			<f:facet name="header">
+				<h:outputText value="Login" />
+			</f:facet>
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{compte.login}" />
+				</f:facet>
+				<f:facet name="input">
+					<h:inputText value="#{compte.login}" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column styleClass="header" sortBy="#{compte.mdp}" filterBy="#{compte.mdp}" filterStyleClass="filter-input"
+			style="width:200px">
+			<f:facet name="header">
+				<h:outputText value="Password" />
+			</f:facet>
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{compte.mdp}" />
+				</f:facet>
+				<f:facet name="input">
+					<h:inputText value="#{compte.mdp}" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column styleClass="header" sortBy="#{compte.site.libelle}" filterBy="#{compte.site.libelle}" filterStyleClass="filter-input"
+			style="width:200px">
+			<f:facet name="header">
+				<h:outputText value="Site" />
+			</f:facet>
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{compte.site.libelle}" />
+				</f:facet>
+				<f:facet name="input">
+					<h:inputText value="#{compte.site.libelle}" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column style="width:50px;margin-left:auto;margin-right:auto">
+			<f:facet name="header">
+                <p:commandLink styleClass="ui-icon ui-icon-plus" style="width:20px; height:20px" onsuccess="dlg.show()" action="#{mdpManagedBean.createNew}" />
+			</f:facet>
+            <p:rowEditor />
+		</p:column>
+		<p:column style="width:60px;margin-left:auto;margin-right:auto">
+			<f:facet name="header">
+                <p:commandButton icon="ui-icon-trash" style="width:20px; height:20px" actionListener="#{mdpManagedBean.deleteListener}" update="@form" />
+			</f:facet>
+            <p:commandButton icon="ui-icon-trash" style="width:20px; height:20px" actionListener="#{mdpManagedBean.delete(compte)}" update="@form"/>
+		</p:column>
+	</p:dataTable>
+</h:form>	
+</h:body>
+</html>

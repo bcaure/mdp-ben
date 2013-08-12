@@ -1,0 +1,31 @@
+#headline {
+    font-family: 'Hoefler Text',Georgia,'Times New Roman',serif;
+    font-size: 1.75em;
+    font-weight: normal;
+    letter-spacing: 0.2em;
+    line-height: 1.1em;
+    margin-left: 20px;
+    right: 220px;
+    text-align: center;
+    top: 20px;
+}
+
+.ui-button{
+    width:20px; 
+    height:20px
+}
+
+body {
+    background-color: #A9D9BE;
+    color: #1B818C;
+    font-family: 'Hoefler Text',Georgia,'Times New Roman',serif;
+    font-size: 0.75em;
+    font-weight: normal;
+}
+
+input {
+    color: #40200E;
+    border-color: #F23A29;
+    border-style: solid;
+    border-width: 1px;
+}
