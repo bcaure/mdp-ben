@@ -5,9 +5,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
-import com.mdp.persistence.dao.UserManager;
 import com.mdp.persistence.entity.SiteUser;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.faces.bean.ManagedProperty;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 
 @ManagedBean(name="loginManagedBean")
 @SessionScoped
@@ -17,46 +20,53 @@ public class LoginManagedBean {
     
     @ManagedProperty(value="#{mdpManagedBean}")
     protected MdpManagedBean mdpManagedBean;
+    
+    @PersistenceUnit(unitName="MdpPersistence")
+    private EntityManagerFactory em;
 
-	public String authenticate(){
-		
-		Boolean isAuthenticated = false;
-		
-		SiteUser user = mdpManagedBean.getUser();
-		if (user == null){
-			if (userName != null && !userName.equals("")){
-				user = (new UserManager()).get(userName);
-				if (user!=null && user.getPassword().equals(password)){
-					isAuthenticated = true;
-					mdpManagedBean.setUser(user);
-				} else {
-					user = null;
-					FacesMessage fm = new FacesMessage("Authentication fails");
-					FacesContext.getCurrentInstance().addMessage("xxx", fm);
-				}
-			}
-		} else {
-			isAuthenticated = true;
-		}
-		
-		return isAuthenticated?"primeFacesGrid":"index";
-	}
+    public String authenticate(){
 
-	public String getUserName() {
-		return userName;
-	}
+            Boolean isAuthenticated = false;
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+            SiteUser user = mdpManagedBean.getUser();
+            if (user == null){
+                if (userName != null && !userName.equals("")){
+                    try {
+                        user = em.createEntityManager().find(SiteUser.class, userName);
+                        if (user!=null && user.getPassword().equals(password)){
+                                isAuthenticated = true;
+                                mdpManagedBean.setUser(user);
+                        } 
+                    } catch (Exception e) {
+                        StringWriter writer = new StringWriter();
+                        PrintWriter out = new PrintWriter(writer);
+                        e.printStackTrace(out);
+                        FacesMessage fm = new FacesMessage("Authentication fails", writer.toString());
+                        FacesContext.getCurrentInstance().addMessage("xxx", fm);
+                    }
+                }
+            } else {
+                isAuthenticated = true;
+            }
 
-	public String getPassword() {
-		return password;
-	}
+            return isAuthenticated?"primeFacesGrid":"index";
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getUserName() {
+            return userName;
+    }
+
+    public void setUserName(String userName) {
+            this.userName = userName;
+    }
+
+    public String getPassword() {
+            return password;
+    }
+
+    public void setPassword(String password) {
+            this.password = password;
+    }
 
     public MdpManagedBean getMdpManagedBean() {
         return mdpManagedBean;

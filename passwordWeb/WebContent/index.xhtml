@@ -12,7 +12,7 @@
 </h:head>
 <h:body>
 <h:form >
-	<span id="headline">Login/Passwd</span> 
+    <span id="headline">Login/Passwd</span><span style="font-size:0.75em">&nbsp;1.0</span> 
 	<br />	
 	<h:messages />
 	<h:panelGrid columns="2" styleClass="simple-form" style="margin-bottom:10px">  
@@ -20,7 +20,7 @@
 		<h:inputText value="#{loginManagedBean.userName}" styleClass="spec" />
 		<h:outputText value="Password:" />
 		<h:inputSecret value="#{loginManagedBean.password}" styleClass="spec" />
-		<p:commandButton icon="ui-icon-check" action="#{loginManagedBean.authenticate}"/>
+                <h:commandButton styleClass="ui-commandbutton ui-icon ui-icon-check" style="cursor: pointer" action="#{loginManagedBean.authenticate}" />
 	</h:panelGrid>
 </h:form>
 </h:body>

@@ -1,139 +1,152 @@
 package com.mdp.web.bean;
 
-import com.mdp.persistence.dao.CompteManager;
-import com.mdp.persistence.dao.UserManager;
 import com.mdp.persistence.entity.Compte;
 import com.mdp.persistence.entity.Site;
 import com.mdp.persistence.entity.SiteUser;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import org.primefaces.event.RowEditEvent;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
-@ManagedBean(name="mdpManagedBean")
+@ManagedBean(name = "mdpManagedBean")
 @SessionScoped
 public class MdpManagedBean {
 
-	protected SiteUser user;
-	protected Compte[] selectedComptes;
-	protected Integer maxRows = 15;
+    protected SiteUser user;
     protected Compte compte;
+    @PersistenceContext(unitName = "MdpPersistence")
+    private EntityManager em;
+    @Resource
+    UserTransaction utx;    
+    
+    protected List<Compte> filteredValues;
+    protected Compte[] selectedComptes;
+    
+    public void modifyListener(Compte modifiedCompte) {
 
-	
-	public void modifyListener(RowEditEvent event) {
-		
-		Compte modifiedCompte = (Compte) event.getObject();        
-        
-		CompteManager compteManager = new CompteManager();
-		
-		try{
-			compteManager.modify(modifiedCompte);
-			FacesMessage fm = new FacesMessage("Modification OK!");
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
+        try {
+            utx.begin();
+            em.merge(modifiedCompte);
+            utx.commit();
+            FacesMessage fm = new FacesMessage("Modification OK!", "");
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            PrintWriter out = new PrintWriter(writer);
+            e.printStackTrace(out);
+            FacesMessage fm = new FacesMessage("Modification fails!", writer.toString());
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+                Logger.getLogger(MdpManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
 
-		} catch (Exception e){
-			FacesMessage fm = new FacesMessage("Modification fails:"+e.getMessage());
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		}
+    }
 
-	}
-
-	
-	public void delete(Compte compte){
- 		try{
+    public void delete(Compte compte) {
+        try {
+            utx.begin();
             user.getComptes().remove(compte);
-            UserManager userManager = new UserManager();
-            userManager.merge(user);
-		} catch (Exception e){
-			FacesMessage fm = new FacesMessage("Delete fails:"+e.getMessage());
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		}
-	}
-	
-	public void deleteListener(){
- 		try{
+            em.merge(user);
+            utx.commit();
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            PrintWriter out = new PrintWriter(writer);
+            e.printStackTrace(out);
+            FacesMessage fm = new FacesMessage("Delete fails:", writer.toString());
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+                Logger.getLogger(MdpManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+    }
+
+    public void deleteListener() {
+        try {
+            utx.begin();
             Collection<Compte> collection = Arrays.asList(selectedComptes);
             user.getComptes().removeAll(collection);
-            UserManager userManager = new UserManager();
-            userManager.merge(user);
-		} catch (Exception e){
-			FacesMessage fm = new FacesMessage("Delete fails:"+e.getMessage());
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		}
-	}
-    
-    public void createNew(){
+            em.merge(user);
+            utx.commit();
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            PrintWriter out = new PrintWriter(writer);
+            e.printStackTrace(out);
+            FacesMessage fm = new FacesMessage("Delete fails:", writer.toString());
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+                Logger.getLogger(MdpManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+    }
+
+    public void createNew() {
         compte = new Compte();
         compte.setSite(new Site());
         compte.getSite().setComptes(new ArrayList<Compte>());
         compte.getSite().getComptes().add(compte);
     }
-    
-	public void createListener(){
-		
-		try {
+
+    public void createListener() {
+
+        try {
+            utx.begin();
             user.getComptes().add(compte);
             compte.setUser(user);
-            CompteManager compteManager = new CompteManager();
-            compteManager.create(compte);
+            
+            em.persist(compte);
+            utx.commit();
 
             FacesMessage fm = new FacesMessage("Creation OK!");
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		} catch (Exception e1) {
-			FacesMessage fm = new FacesMessage("Creation fails:"+e1);
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		}
-		
-		compte = null;
-	}
-
-	public List<Compte> autocomplete(Object suggest) {
-
-		String pref = (String) suggest;
-		ArrayList<Compte> result = new ArrayList<Compte>();
-		
-		Iterator<Compte> iterator = user.getComptes().iterator();
-		while (iterator.hasNext()) {
-			
-		    Compte elem = iterator.next();
-		
-		    if ((elem.getSite().getUrl() != null 
-		    		&& elem.getSite().getUrl().toLowerCase().indexOf(pref.toLowerCase()) >= 0) 
-		    		|| "".equals(pref)) {
-	    		System.out.println("Suggestion found:"+elem.getSite().getUrl());
-				FacesMessage fm = new FacesMessage("Suggestion found");
-				FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		        result.add(elem);
-		    }
-
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            PrintWriter out = new PrintWriter(writer);
+            e.printStackTrace(out);
+            FacesMessage fm = new FacesMessage("Creation fails:", writer.toString());
+            FacesContext.getCurrentInstance().addMessage("xxx", fm);
+            try {
+                utx.rollback();
+            } catch (Exception ex) {
+                Logger.getLogger(MdpManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+            } 
         }
 
-		if (result.isEmpty()){
-    		System.out.println("No suggestion found!");
-			FacesMessage fm = new FacesMessage("No suggestion found");
-			FacesContext.getCurrentInstance().addMessage("xxx", fm);
-		}
-        return result;
+        compte = null;
+    }
 
-     }
+    public List<Compte> getFilteredValues() {
+        return filteredValues;
+    }
 
-	public Integer getMaxRows() {
-		return maxRows;
-	}
+    public void setFilteredValues(List<Compte> filteredValues) {
+        this.filteredValues = filteredValues;
+    }
 
-	public void setMaxRows(Integer maxRows) {
-		this.maxRows = maxRows;
-	}
 
-	public Compte[] getSelectedComptes() {
-		return selectedComptes;
-	}
+    public Compte[] getSelectedComptes() {
+        return selectedComptes;
+    }
 
-	public void setSelectedComptes(Compte[] selectedComptes) {
-		this.selectedComptes = selectedComptes;
-	}
+    public void setSelectedComptes(Compte[] selectedComptes) {
+        this.selectedComptes = selectedComptes;
+    }
 
     public Compte getCompte() {
         return compte;
@@ -150,5 +163,4 @@ public class MdpManagedBean {
     public void setUser(SiteUser user) {
         this.user = user;
     }
-    
 }
