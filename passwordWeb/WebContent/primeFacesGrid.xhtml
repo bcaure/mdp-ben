@@ -124,14 +124,11 @@
                 </p:column>
                 <p:column style="width:50px;margin-left:auto;margin-right:auto">
                     <f:facet name="header">
-                        <p:commandLink styleClass="ui-icon ui-icon-plus" style="width:20px; height:20px" onsuccess="dlg.show()" action="#{mdpManagedBean.createNew}" />
+                        <p:commandLink styleClass="ui-icon ui-icon-plus" style="width:20px; height:20px" onclick="dlg.show()" />
                     </f:facet>
                     <p:rowEditor />
                 </p:column>
                 <p:column style="width:60px;margin-left:auto;margin-right:auto">
-                    <f:facet name="header">
-                        <p:commandButton icon="ui-icon-trash" style="width:20px; height:20px" actionListener="#{mdpManagedBean.deleteListener}" update="@form" />
-                    </f:facet>
                     <p:commandButton icon="ui-icon-trash" style="width:20px; height:20px;" actionListener="#{mdpManagedBean.delete(compte)}" update="@form"/>
                 </p:column>
             </p:dataTable>

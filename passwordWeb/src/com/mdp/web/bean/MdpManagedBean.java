@@ -31,6 +31,12 @@ public class MdpManagedBean {
     
     protected List<Compte> filteredValues;
     protected Compte[] selectedComptes;
+
+    public MdpManagedBean() {
+        createNew();
+    }
+    
+    
     
     public void modifyListener(Compte modifiedCompte) {
 
@@ -128,7 +134,7 @@ public class MdpManagedBean {
             } 
         }
 
-        compte = null;
+        createNew();
     }
 
     public List<Compte> getFilteredValues() {
