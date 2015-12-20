@@ -12,18 +12,5 @@
            <property name="eclipselink.logging.level" value="OFF"/>
        </properties>
     </persistence-unit>
-  <!--	
-  <persistence-unit name="MdpPersistence" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.mdp.persistence.entity.Compte</class>
-    <class>com.mdp.persistence.entity.Site</class>
-    <class>com.mdp.persistence.entity.SiteUser</class>
-    <properties>
-      <property name="eclipselink.jdbc.driver" value="org.gjt.mm.mysql.Driver"/>
-      <property name="eclipselink.jdbc.url" value="jdbc:mysql://choraledecournon.dyndns.org:3306/password"/>
-      <property name="eclipselink.jdbc.user" value="ben"/>
-      <property name="eclipselink.jdbc.password" value="azeqsd1&amp;"/>
-      <property name="eclipselink.logging.level" value="FINEST"/>
-    </properties>
-  </persistence-unit> -->
+
 </persistence>
